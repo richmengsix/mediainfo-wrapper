@@ -1,22 +1,8 @@
+var os = require('os');
 var path = require('path'),
     xml2js = require('xml2js'),
     glob = require('glob'),
     exec = require('child_process').exec;
-
-function getCmd() {
-    var arch = process.arch.match(/64/) ? '64' : '32';
-
-    switch (process.platform) {
-        case 'darwin':
-            return safeLocalPath(path.join(__dirname, '/lib/osx64/mediainfo'));
-        case 'win32':
-            return safeLocalPath(path.join(__dirname, '/lib/win32/mediainfo.exe'));
-        // case 'linux':
-        //     return "LD_LIBRARY_PATH=" + safeLocalPath(path.join(__dirname, '/lib/linux' + arch)) + " " + safeLocalPath(path.join(__dirname, '/lib/linux' + arch, '/mediainfo'));
-        default:
-            throw 'unsupported platform';
-    }
-}
 
 function buildOutput(obj) {
     var out = {};
@@ -102,15 +88,14 @@ function safeLocalPath(path) {
     return path;
 }
 
-module.exports = function MediaInfo() {
-    var args = [].slice.call(arguments);
-    var cmd_options = typeof args[0] === "object" ? args.shift() : {};
+function MediaInfo(mi_path, media_path) {
+    var cmd_options =  {};
     var cmd = [];
 
-    cmd.push(getCmd()); // base command
+    cmd.push(mi_path); // base command
     cmd.push('--Output=XML --Full'); // args
-    Array.prototype.slice.apply(args).forEach(function (val, idx) {
-        var files = glob.sync(val, {cwd: (cmd_options.cwd || process.cwd()), nonull: true});
+    Array.prototype.slice.apply([media_path]).forEach(function (val, idx) {
+        var files = glob.sync(val, { cwd: (cmd_options.cwd || process.cwd()), nonull: true });
         for (var i in files) {
             cmd.push(safeLocalPath(files[i])); // files
         }
@@ -123,3 +108,34 @@ module.exports = function MediaInfo() {
         });
     });
 };
+
+
+var platform = os.platform()
+//patch for compatibilit with electron-builder, for smart built process.
+if (platform == "darwin") {
+    platform = "mac";
+} else if (platform == "win32") {
+    platform = "win";
+}
+//adding browser, for use case when module is bundled using browserify. and added to html using src.
+if (platform !== 'linux' && platform !== 'mac' && platform !== 'win' && platform !== "browser") {
+    console.error('Unsupported platform.', platform);
+    process.exit(1)
+}
+
+var arch = os.arch()
+if (platform === 'mac' && (arch !== 'x64' && arch !== 'arm64')) {
+    console.error('Unsupported architecture.')
+    process.exit(1)
+}
+
+var path = path.join(
+    __dirname,
+    'bin',
+    platform,
+    arch,
+    platform === 'win' ? 'mediainfo.exe' : 'mediainfo'
+)
+
+exports.path = path;
+exports.mi = MediaInfo;
