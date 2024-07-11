@@ -11,8 +11,8 @@ function getCmd() {
             return safeLocalPath(path.join(__dirname, '/lib/osx64/mediainfo'));
         case 'win32':
             return safeLocalPath(path.join(__dirname, '/lib/win32/mediainfo.exe'));
-        case 'linux':
-            return "LD_LIBRARY_PATH=" + safeLocalPath(path.join(__dirname, '/lib/linux' + arch)) + " " + safeLocalPath(path.join(__dirname, '/lib/linux' + arch, '/mediainfo'));
+        // case 'linux':
+        //     return "LD_LIBRARY_PATH=" + safeLocalPath(path.join(__dirname, '/lib/linux' + arch)) + " " + safeLocalPath(path.join(__dirname, '/lib/linux' + arch, '/mediainfo'));
         default:
             throw 'unsupported platform';
     }
