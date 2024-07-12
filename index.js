@@ -55,26 +55,30 @@ function buildOutput(obj) {
     return out;
 }
 
-function buildJson(xml) {
+function buildJson(jsonStr) {
     return new Promise(function (resolve, reject) {
-        xml2js.parseString(xml, function (err, obj) {
-            if (err) return reject(err);
-            if (!obj['Mediainfo']) return reject('Something went wrong');
+        console.log('jsonStr', jsonStr);
+        const obj = JSON.parse(jsonStr);
+        resolve(obj);
 
-            obj = obj['Mediainfo'];
+        // xml2js.parseString(xml, function (err, obj) {
+        //     if (err) return reject(err);
+        //     console.log('obj', obj);
 
-            var out = [];
+        //     if (!obj['Mediainfo']) return reject('Something went wrong');
 
-            if (Array.isArray(obj.File)) {
-                for (var i in obj.File) {
-                    out.push(buildOutput(obj.File[i]));
-                }
-            } else {
-                out.push(buildOutput(obj.File));
-            }
+        //     obj = obj['Mediainfo'];
 
-            resolve(out);
-        });
+        //     var out = [];
+
+        //     if (Array.isArray(obj.File)) {
+        //         for (var i in obj.File) {
+        //             out.push(buildOutput(obj.File[i]));
+        //         }
+        //     } else {
+        //         out.push(buildOutput(obj.File));
+        //     }
+        // });
     });
 }
 
@@ -89,11 +93,11 @@ function safeLocalPath(path) {
 }
 
 function MediaInfo(mi_path, media_path) {
-    var cmd_options =  {};
+    var cmd_options = {};
     var cmd = [];
 
     cmd.push(mi_path); // base command
-    cmd.push('--Output=XML --Full'); // args
+    cmd.push('--Output=JSON --Full'); // args
     Array.prototype.slice.apply([media_path]).forEach(function (val, idx) {
         var files = glob.sync(val, { cwd: (cmd_options.cwd || process.cwd()), nonull: true });
         for (var i in files) {
