@@ -4,60 +4,10 @@ var path = require('path'),
     glob = require('glob'),
     exec = require('child_process').exec;
 
-function buildOutput(obj) {
-    var out = {};
-    var idVid = idAud = idTex = idMen = idOth = 0;
-
-    for (var i in obj.track) {
-        if (obj.track[i]['$']['type'] === 'General') {
-            out.file = obj.track[i]['Complete_name'][0];
-            out.general = {};
-            for (var f in obj.track[i]) {
-                if (f !== '$') out.general[f.toLowerCase()] = obj.track[i][f];
-            }
-        } else if (obj.track[i]['$']['type'] === 'Video') {
-            if (!idVid) out.video = [];
-            out.video[idVid] = {};
-            for (var f in obj.track[i]) {
-                if (f !== '$') out.video[idVid][f.toLowerCase()] = obj.track[i][f];
-            }
-            idVid++;
-        } else if (obj.track[i]['$']['type'] === 'Audio') {
-            if (!idAud) out.audio = [];
-            out.audio[idAud] = {};
-            for (var f in obj.track[i]) {
-                if (f !== '$') out.audio[idAud][f.toLowerCase()] = obj.track[i][f];
-            }
-            idAud++;
-        } else if (obj.track[i]['$']['type'] === 'Text') {
-            if (!idTex) out.text = [];
-            out.text[idTex] = {};
-            for (var f in obj.track[i]) {
-                if (f !== '$') out.text[idTex][f.toLowerCase()] = obj.track[i][f];
-            }
-            idTex++;
-        } else if (obj.track[i]['$']['type'] === 'Menu') {
-            if (!idMen) out.menu = [];
-            out.menu[idMen] = {};
-            for (var f in obj.track[i]) {
-                if (f !== '$') out.menu[idMen][f.toLowerCase()] = obj.track[i][f];
-            }
-            idMen++;
-        } else {
-            if (!idOth) out.other = [];
-            out.other[idOth] = {};
-            for (var f in obj.track[i]) {
-                if (f !== '$') out.other[idOth][f.toLowerCase()] = obj.track[i][f];
-            }
-            idOth++;
-        }
-    }
-    return out;
-}
 
 function buildJson(jsonStr) {
     return new Promise(function (resolve, reject) {
-        console.log('jsonStr', jsonStr);
+        // console.log('jsonStr', jsonStr);
         const obj = JSON.parse(jsonStr);
         resolve(obj);
 
