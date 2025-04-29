@@ -46,7 +46,7 @@ function MediaInfo(mi_path, media_path) {
     var cmd_options = {};
     var cmd = [];
 
-    cmd.push(mi_path); // base command
+    cmd.push(safeLocalPath(mi_path)); // base command
     cmd.push('--Output=JSON --Full'); // args
     Array.prototype.slice.apply([media_path]).forEach(function (val, idx) {
         var files = glob.sync(val, { cwd: (cmd_options.cwd || process.cwd()), nonull: true });
